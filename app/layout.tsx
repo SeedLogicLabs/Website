@@ -36,18 +36,16 @@ export const metadata: Metadata = {
     "fintech Kenya",
     "identity verification SDK",
   ],
+  // No title/description/url here: child pages would inherit them and every
+  // og:title would point at the home page. Next fills them from each page's
+  // resolved title and description.
   openGraph: {
     type: "website",
     siteName: site.name,
     locale: "en_KE",
-    url: "/",
-    title: `${site.name} | ${site.tagline}`,
-    description: site.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} | ${site.tagline}`,
-    description: site.description,
   },
   robots: {
     index: true,
@@ -66,7 +64,6 @@ const organization: WithContext<Organization> = {
   slogan: site.tagline,
   description: site.description,
   email: site.email,
-  foundingDate: site.founded,
   address: {
     "@type": "PostalAddress",
     addressLocality: site.location.city,

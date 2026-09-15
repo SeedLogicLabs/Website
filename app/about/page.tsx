@@ -54,7 +54,7 @@ export default function AboutPage() {
             </p>
             <dl className="mt-8 grid grid-cols-2 gap-4">
               {[
-                ["Founded", site.founded],
+                ["Products", "4 in progress"],
                 ["Based in", `${site.location.city}, ${site.location.country}`],
                 ["Focus", "Mobile-first products"],
                 ["Stage", "Pre-launch"],

@@ -18,7 +18,6 @@ export const site = {
     country: "Kenya",
     countryCode: "KE",
   },
-  founded: "2024", // TODO(founder): confirm founding year
   socials: [
     // TODO(founder): replace with the real company profiles.
     { label: "LinkedIn", href: "https://www.linkedin.com/company/seedlogic-labs" },

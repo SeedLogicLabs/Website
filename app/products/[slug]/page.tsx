@@ -7,12 +7,14 @@ import { site } from "@/content/site";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Section } from "@/components/ui/Section";
 import { StatusBadge } from "@/components/ui/Badge";
-import { ButtonAnchor, ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { FeatureGrid } from "@/components/marketing/FeatureGrid";
 import { DeveloperPreview } from "@/components/marketing/DeveloperPreview";
 import { CtaBand } from "@/components/marketing/CtaBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Reveal } from "@/components/motion/Reveal";
+import { WaitlistForm } from "@/components/forms/WaitlistForm";
+import { Card } from "@/components/ui/Card";
 
 export const dynamicParams = false;
 
@@ -55,10 +57,6 @@ export default async function ProductPage(props: PageProps<"/products/[slug]">) 
     offers: { "@type": "Offer", price: "0", priceCurrency: "KES", availability: "https://schema.org/PreOrder" },
   };
 
-  const mailto = `mailto:${site.email}?subject=${encodeURIComponent(
-    `${product.name} waitlist`,
-  )}`;
-
   return (
     <>
       <JsonLd data={jsonLd} />
@@ -78,9 +76,20 @@ export default async function ProductPage(props: PageProps<"/products/[slug]">) 
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr]">
           <Reveal>
             <p className="text-lg leading-8 text-muted">{product.description}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              {/* Phase 2 replaces this mailto with the waitlist form. */}
-              <ButtonAnchor href={mailto}>Join the waitlist</ButtonAnchor>
+            {product.waitlist ? (
+              <Card className="mt-8" id="waitlist">
+                <h2 className="text-lg font-semibold tracking-tight text-text">
+                  Get early access to {product.name}
+                </h2>
+                <p className="mt-1 text-sm text-muted">
+                  Join the waitlist and we will tell you the moment there is something to try.
+                </p>
+                <div className="mt-5">
+                  <WaitlistForm productSlug={product.slug} productName={product.name} />
+                </div>
+              </Card>
+            ) : null}
+            <div className="mt-6">
               <ButtonLink href="/contact" variant="secondary">
                 Ask a question
               </ButtonLink>

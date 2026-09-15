@@ -30,5 +30,11 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !!process.env.PLAYWRIGHT_REUSE_SERVER,
         timeout: 120_000,
+        env: {
+          ...process.env,
+          // Happy-path form tests only run when a test database is provided.
+          DATABASE_URL: process.env.E2E_DATABASE_URL ?? process.env.DATABASE_URL ?? "",
+          IP_HASH_SALT: process.env.IP_HASH_SALT ?? "e2e-only-salt-not-for-production",
+        },
       },
 });
