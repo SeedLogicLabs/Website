@@ -3,6 +3,7 @@ import { Hero } from "@/components/marketing/Hero";
 import { ProductGrid } from "@/components/marketing/ProductGrid";
 import { PrinciplesGrid } from "@/components/marketing/PrinciplesGrid";
 import { CtaBand } from "@/components/marketing/CtaBand";
+import { LatestPost } from "@/components/marketing/LatestPost";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/motion/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
@@ -79,6 +80,8 @@ export default function Home() {
           </Reveal>
         </div>
       </Section>
+
+      <LatestPost />
 
       <CtaBand />
     </>
