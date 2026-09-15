@@ -1,0 +1,8 @@
+# Netlify auto-detects Next.js and installs @netlify/plugin-nextjs (Next.js Runtime v5).
+# Do not pin the plugin; Netlify updates it per build.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
