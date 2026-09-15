@@ -1,130 +1,146 @@
 # Architectural patterns and conventions
 
-Scope note: the codebase currently has two React files (`app/layout.tsx`, `app/page.tsx`),
-one stylesheet (`app/globals.css`) and four config files. Everything below is a
-convention that is already visible across at least two of those files. There is no
-dependency injection, state management, data layer, or API surface yet, so none is
-documented here. Revisit this file once real components and routes exist.
+Patterns that recur across the codebase. Each one names the files that establish it so you can
+copy the shape rather than invent a new one. See also `content_authoring.md` and `deployment.md`.
 
-## 1. Next.js App Router file conventions
+## 1. Static-first App Router; client code only at the leaves
 
-- Routing is filesystem-based under `app/`. `app/page.tsx` is the `/` route;
-  `app/layout.tsx` is the mandatory root layout that renders `<html>` and `<body>`
-  (`app/layout.tsx:21-27`).
-- Global CSS is imported exactly once, in the root layout (`app/layout.tsx:3`), never in
-  pages or components.
-- Static files live in `public/` and are referenced by absolute URL path
-  (`app/page.tsx:9`, `app/page.tsx:50`).
-- `app/favicon.ico` is picked up by the metadata file convention with no code.
-- Site metadata is exported as a typed `metadata` constant from the layout
-  (`app/layout.tsx:15-18`), not set via `<head>` tags.
+Every route under `app/` is a prerendered Server Component (`next build` shows `○`/`●` for all of
+them). Client Components carry `"use client"` at the top and are small leaves:
 
-Reference: `node_modules/next/dist/docs/01-app/01-getting-started/02-project-structure.md`.
-
-## 2. Server Components by default
-
-Neither `app/layout.tsx` nor `app/page.tsx` has a `"use client"` directive. Both are
-React Server Components. Fonts, metadata, and static markup are all resolved on the
-server. Add `"use client"` only to leaf components that need state, effects, or browser
-APIs, and keep it out of layouts and pages.
-
-Reference: `node_modules/next/dist/docs/01-app/01-getting-started/05-server-and-client-components.md`.
-
-## 3. Typed routes and generated props
-
-The root layout is typed with the Next-generated global `LayoutProps<"/">`
-(`app/layout.tsx:20`) instead of a hand-written `{ children: React.ReactNode }` type.
-These globals come from `.next/types/routes.d.ts`, pulled in through `next-env.d.ts`.
-Consequences:
-
-- Run `npx next typegen` before `npx tsc --noEmit` on a clean checkout.
-- New pages and layouts should use `PageProps<"/path">` / `LayoutProps<"/path">` the
-  same way, so route params stay in sync with the filesystem.
-
-Reference: `node_modules/next/dist/docs/01-app/03-api-reference/05-config/02-typescript.md`.
-
-## 4. Theming: a three-layer CSS-variable pipeline
-
-Design tokens flow from the layout, through the stylesheet, into utility classes.
-This is the one pattern that genuinely spans all three source files.
-
-1. **Font variables are declared in the layout.** `next/font/google` is configured
-   with `variable:` names (`app/layout.tsx:5-13`) and those class names are applied to
-   `<html>` (`app/layout.tsx:24`), which puts `--font-geist-sans` and
-   `--font-geist-mono` on the root element.
-2. **`globals.css` maps raw variables to Tailwind tokens.** The `@theme inline` block
-   (`app/globals.css:8-13`) exposes `--color-background`, `--color-foreground`,
-   `--font-sans`, and `--font-mono` as Tailwind v4 theme values. Color sources are the
-   plain `:root` variables at `app/globals.css:3-6`.
-3. **Pages consume tokens only through utilities.** `font-sans` (`app/page.tsx:5`) and
-   `bg-foreground text-background` (`app/page.tsx:43`) are the generated utilities.
-   No component references a CSS variable or hex value directly for themed colors.
+- `components/layout/MobileNav.tsx`, `NavLink.tsx` (state, `usePathname`)
+- `components/forms/WaitlistForm.tsx`, `ContactForm.tsx`, `SubmitButton.tsx` (`useActionState`,
+  `useFormStatus`)
+- `components/motion/Reveal.tsx` (Framer Motion)
+- `app/error.tsx`, `app/global-error.tsx`
 
 Rules that follow:
+- A Server Component passes server-rendered content into a client leaf via `children`
+  (`Reveal` wraps cards; the header stays a Server Component and only `MobileNav` is client).
+- Request-time data that would make a route dynamic is read on the client instead:
+  `ContactForm` reads `?interest=` with `useSearchParams` inside a `<Suspense>` in
+  `app/contact/page.tsx`, so `/contact` stays static. Do not convert it to `searchParams`.
+- `cacheComponents` is off. No `dynamic`/`revalidate` exports are needed.
 
-- Add new tokens in `@theme inline`, not in a `tailwind.config` file. Tailwind v4 is
-  CSS-first and this project has no JS config (`postcss.config.mjs` is the only wiring).
-- Fonts only apply where a `font-sans` / `font-mono` utility is present. The `body`
-  rule in `app/globals.css:25` still falls back to Arial, so unstyled text is not Geist.
+## 2. Content as code, validated at build time
 
-Reference: `node_modules/next/dist/docs/01-app/01-getting-started/11-css.md` and `13-fonts.md`.
+There is no CMS. Two kinds of content:
 
-## 5. Dark mode via `prefers-color-scheme`
+- **Typed TS data** for stable structures: `content/site.ts` (company, nav, socials, principles)
+  and `content/products.ts` (`Product[]`, `PRODUCT_SLUGS`). Pages, cards, sitemap, OG images and
+  the form enums all read from these; `content/products.test.ts` guards their invariants.
+- **MDX files** for long-form: `content/blog/*.mdx`, `content/careers/*.mdx`. Each file starts with
+  `export const metadata = {...}` (the native `@next/mdx` approach, no frontmatter plugins).
+  Loaders in `lib/content/blog.ts` and `lib/content/careers.ts` list the directory with `fs`,
+  import each module with a literal-prefix dynamic import
+  (`import(\`@/content/blog/${slug}.mdx\`)`), and validate `metadata` with the Zod schemas in
+  `lib/content/schemas.ts`. Invalid metadata throws, which fails `next build`.
+- Publication state is data: `draft: true` on posts, `status !== "open"` on roles. Those items are
+  excluded from listings, the sitemap and `generateStaticParams`, and their URLs 404.
 
-Two mechanisms are used together and must stay consistent:
+Dynamic segments always ship `generateStaticParams` + `export const dynamicParams = false`
+(`app/products/[slug]/page.tsx`, `app/blog/[slug]/page.tsx`, `app/careers/[slug]/page.tsx`).
 
-- Token swap: `app/globals.css:15-20` overrides `--background` / `--foreground` under
-  `@media (prefers-color-scheme: dark)`, so every `bg-background` / `text-foreground`
-  utility flips automatically.
-- Per-element variants: `dark:` utilities in `app/page.tsx` (lines 5, 6, 8, 16, 18, 23, 27, 34,
-  43, 49, 58) handle one-off colors and `dark:invert` for monochrome SVG logos.
+## 3. Design tokens flow layout → globals.css → utilities
 
-Tailwind v4's `dark:` variant also keys off `prefers-color-scheme` by default, so there
-is no class-based theme toggle. Introducing one requires a `@custom-variant dark` in
-`globals.css` and a decision about the media query at `app/globals.css:15`.
+- `app/layout.tsx` loads Geist and Geist Mono with `next/font` `variable:` names and puts them on
+  `<html>`.
+- `app/globals.css` declares every color, font, radius and shadow inside `@theme` (Tailwind v4 is
+  CSS-first; there is no `tailwind.config`). Custom utilities (`text-gradient`,
+  `bg-accent-gradient`, `bg-dot-grid`, `bg-hero-glow`, `animate-rise`) are defined with
+  `@utility` in the same file.
+- Components use only generated utilities (`bg-ink`, `text-muted`, `border-line`, `font-mono`).
+  No hex values in TSX, except the OG renderer (`lib/og.tsx`) and `app/global-error.tsx`, which
+  cannot use the stylesheet.
+- The site is dark-only: `color-scheme: dark` on `:root`; there is no light theme or toggle.
+- Contrast is part of the token set: `--color-faint` is the dimmest text allowed on `ink`
+  (5.5:1). Buttons on the accent gradient use `text-ink`.
 
-## 6. Images
+## 4. Motion is progressive enhancement
 
-Static images go through `next/image`, never a raw `<img>`:
+- Above the fold uses CSS-only `animate-rise` so LCP text exists in server HTML and never waits
+  for hydration (`components/marketing/Hero.tsx`, `components/ui/PageHeader.tsx`).
+- Below the fold uses `components/motion/Reveal.tsx`: `LazyMotion` + `domAnimation` + `m.div`,
+  `whileInView` once. Props are identical on server and client (no hydration mismatch).
+- Two fallbacks make hidden-on-server content safe: `[data-reveal]` is forced visible under
+  `prefers-reduced-motion` in `globals.css`, and under `<noscript>` in `app/layout.tsx`.
+  `tests/e2e/navigation.spec.ts` asserts the reduced-motion case.
+- Never JS-animate an LCP candidate; never pass functions (easings, callbacks) from a Server
+  Component into `Reveal`.
 
-- Source is a `public/` path, with explicit `width` and `height` (`app/page.tsx:7-14`,
-  `app/page.tsx:48-54`).
-- Above-the-fold images set `priority` (`app/page.tsx:13`).
-- Sizing on screen is controlled with Tailwind classes, while `width`/`height` props
-  only set the intrinsic ratio.
+## 5. Forms: Server Action → shared pipeline → atomic SQL
 
-Reference: `node_modules/next/dist/docs/01-app/01-getting-started/12-images.md`.
+- Actions live in `app/actions/*.ts` with `"use server"` and `import "server-only"`. Signature is
+  `(prevState, formData)` for `useActionState`. They return `ActionState`
+  (`lib/forms/state.ts`), never throw.
+- Both actions delegate to `runFormPipeline` in `lib/forms/pipeline.ts`, which is pure and takes
+  its side effects as `deps` (`ipHash`, `insert`, `limit`, `log`). Order is fixed: honeypot →
+  Zod `safeParse` → IP hash → insert. Validation failures return before any env or DB access.
+- Untrusted input includes hidden fields: `product` and `interest` are Zod enums derived from
+  `PRODUCT_SLUGS` (`lib/validation/waitlist.ts`, `lib/validation/contact.ts`).
+- Rate limiting is one SQL statement (CTE count + conditional insert) in `lib/db/leads.ts`
+  because neon-http has no transactions. It returns `recent_count` and `inserted`; the pipeline
+  maps `recent_count >= limit` to "try later" and `inserted = 0` to a silent success so the list
+  cannot be probed for existing emails.
+- Client forms (`components/forms/*`) render `Honeypot`, `FormStatus`, `ConsentNote` and
+  `SubmitButton`; on error the action echoes `values` so inputs keep what the user typed.
+- Constants a client form needs are kept in Zod-free modules (`lib/validation/interests.ts`) so
+  Zod stays out of the client bundle. Only types are imported from `lib/validation/*.ts` on the
+  client.
 
-## 7. Layout composition with flex columns
+## 6. Database access is lazy and server-only
 
-The root layout owns the page shell: `<html class="h-full">` and
-`<body class="min-h-full flex flex-col">` (`app/layout.tsx:24-26`). Pages then stretch
-with `flex-1` (`app/page.tsx:5-6`) rather than setting their own viewport heights.
-Keep this contract when adding routes: the layout provides the column, the page fills it.
+- `lib/db/client.ts` builds the Drizzle client inside `getDb()` on first use; nothing reads
+  `DATABASE_URL` at import time, so `next build` works without it.
+- Modules that must never reach the browser start with `import "server-only"`
+  (`lib/db/*`, `lib/forms/ip-hash.server.ts`, `app/actions/*`). Consequently nothing under Vitest
+  may import them; unit tests target the pure pipeline, schemas and helpers instead.
+- Schema is `lib/db/schema.ts`; migrations are generated (`npm run db:generate`) and committed
+  under `drizzle/`. Personal data is minimised: emails, topic, message, salted IP hash only.
+- The IP used for rate limiting comes from Netlify's `x-nf-client-connection-ip`; forgeable
+  `x-forwarded-for` is only trusted outside production (`lib/forms/ip.ts`).
 
-## 8. External links
+## 7. SEO and metadata conventions
 
-Off-site anchors that open in a new tab use `target="_blank"` together with
-`rel="noopener noreferrer"` (`app/page.tsx:45-46`, `app/page.tsx:60-61`). Internal
-navigation should use `next/link` once there is more than one route.
+- Root `app/layout.tsx` sets `metadataBase`, a `title.template`, and only shared Open Graph fields
+  (`type`, `siteName`, `locale`). It deliberately omits `openGraph.title/description/url` so child
+  pages own theirs.
+- Every page exports `metadata` or `generateMetadata` with `alternates.canonical`.
+- Structured data is a native `<script type="application/ld+json">` via
+  `components/seo/JsonLd.tsx` (escapes `<`), typed with `schema-dts`: Organization in the layout,
+  SoftwareApplication per product, BlogPosting per post, JobPosting per role.
+- OG images are generated at build by `opengraph-image.tsx` files that all call
+  `renderOgImage` in `lib/og.tsx` (flexbox-only, one bundled TTF from `assets/fonts/`).
+- `app/sitemap.ts` exports `allRoutes()` (fixed routes) for tests and an async default that adds
+  content routes. `app/robots.ts` points at it.
 
-## 9. Configuration is TypeScript / ESM
+## 8. Typed routes
 
-All config files are ES modules: `next.config.ts` (typed with `NextConfig`),
-`eslint.config.mjs` (ESLint 9 flat config composed from `eslint-config-next` presets,
-`eslint.config.mjs:5-16`), and `postcss.config.mjs`. Do not add CommonJS or legacy
-`.eslintrc` files.
+`typedRoutes: true` in `next.config.ts`. Internal links use `next/link` with literal or template
+hrefs; navigation data is typed as `{ href: Route; label }` in `content/site.ts`, and the single
+`as Route` cast lives there. Use `ButtonLink` for internal, `ButtonAnchor` for external or
+`mailto:` targets (`components/ui/Button.tsx`).
 
-## 10. Path alias
+## 9. Security defaults
 
-`@/*` resolves to the repository root (`tsconfig.json:21-23`). Import from `@/app/...`
-or a future `@/components/...` rather than using `../` chains. There is no `src/`
-directory; if one is introduced, update the alias in the same change.
+- Security headers are set once in `next.config.ts` `headers()` and asserted in
+  `tests/e2e/routes.spec.ts`.
+- External anchors always get `target="_blank" rel="noopener noreferrer"` (handled in
+  `ButtonAnchor` and `mdx-components.tsx`).
+- Analytics is the cookieless Cloudflare beacon, rendered only when its token env var exists
+  (`components/analytics/CfAnalytics.tsx`). No consent banner is needed and no form data is sent.
+- Logging in actions is event-name plus non-PII metadata; never the payload.
 
-## Not present yet (do not assume)
+## 10. Testing layers
 
-- No `components/`, `lib/`, or `hooks/` directories.
-- No data fetching, caching directives, Server Actions, or route handlers.
-- No client state library or context providers.
-- No environment variables in use (`.env*` is gitignored at `.gitignore:34`).
-- No tests or test runner.
+- **Vitest** (`*.test.ts(x)` colocated, jsdom): schemas, pipeline with fake deps, IP handling,
+  content invariants, small component renders. Nothing that imports `server-only` modules.
+- **Playwright** (`tests/e2e`, desktop + Pixel 7 projects, port 3100): every fixed route renders
+  with one `h1` and no console errors; content routes are discovered from the live sitemap;
+  form validation errors; happy-path form tests run only with `E2E_DATABASE_URL`.
+- Lighthouse is run manually against `next start` (see `deployment.md`).
+
+## Not present, by design
+
+No light theme, no CMS, no admin UI for submissions, no client-side data fetching, no global
+state library, no i18n, no `proxy.ts`/middleware, no `output: 'export'`.

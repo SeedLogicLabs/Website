@@ -4,12 +4,12 @@ import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { sendContactRequest } from "@/app/actions/contact";
 import { initialActionState, type ActionState } from "@/lib/forms/state";
+import type { ContactField } from "@/lib/validation/contact";
 import {
   CONTACT_INTERESTS,
   INTEREST_LABEL,
   isContactInterest,
-  type ContactField,
-} from "@/lib/validation/contact";
+} from "@/lib/validation/interests";
 import { Field, Input, Select, Textarea } from "@/components/ui/Field";
 import { Honeypot } from "./Honeypot";
 import { SubmitButton } from "./SubmitButton";

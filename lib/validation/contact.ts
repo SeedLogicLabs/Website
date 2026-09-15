@@ -1,29 +1,14 @@
 import { z } from "zod";
-import { PRODUCT_SLUGS } from "@/content/products";
+import { CONTACT_INTERESTS } from "./interests";
 
-/** Product slugs plus a fixed set of non-product topics. */
-export const CONTACT_INTERESTS = [
-  ...PRODUCT_SLUGS,
-  "partnership",
-  "press",
-  "general",
-] as const;
-
-export type ContactInterest = (typeof CONTACT_INTERESTS)[number];
-
-export const INTEREST_LABEL: Record<ContactInterest, string> = {
-  pesapath: "PesaPath",
-  "id-scanner-sdk": "ID Scanner SDK (demo or integration)",
-  "creature-codex": "Creature Codex",
-  "online-cyber": "Online Cyber",
-  partnership: "Partnership",
-  press: "Press",
-  general: "Something else",
-};
-
-export function isContactInterest(value: string): value is ContactInterest {
-  return (CONTACT_INTERESTS as readonly string[]).includes(value);
-}
+// Server-only schema. Topic constants live in ./interests.ts (no Zod) so the
+// client form can import them without bundling the validation library.
+export {
+  CONTACT_INTERESTS,
+  INTEREST_LABEL,
+  isContactInterest,
+  type ContactInterest,
+} from "./interests";
 
 const optionalText = (max: number, label: string) =>
   z
