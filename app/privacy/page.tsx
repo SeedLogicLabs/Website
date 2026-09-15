@@ -66,7 +66,7 @@ export default function PrivacyPage() {
           <ul>
             <li>Waitlist entries: until the product launches and you are notified, or until you ask us to delete them.</li>
             <li>Contact requests: up to 24 months after our last exchange.</li>
-            <li>Hashed IP records: up to 30 days.</li>
+            <li>Hashed IP values: cleared from each record after 30 days; the record itself follows the periods above.</li>
           </ul>
 
           <h2>Who we share it with</h2>

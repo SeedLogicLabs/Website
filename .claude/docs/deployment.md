@@ -66,6 +66,10 @@ handover was 95-96 performance and 100 accessibility, best practices and SEO.
 - Prune old `ip_hash` rows manually now and then; there is no cron on the free tier:
 
   ```sql
+  -- Privacy policy promises hashed IPs are cleared after 30 days
+  UPDATE waitlist_signups SET ip_hash = '' WHERE ip_hash <> '' AND created_at < now() - interval '30 days';
+  UPDATE contact_requests SET ip_hash = '' WHERE ip_hash <> '' AND created_at < now() - interval '30 days';
+  -- Contact requests are kept up to 24 months
   DELETE FROM contact_requests WHERE created_at < now() - interval '24 months';
   ```
 

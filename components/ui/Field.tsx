@@ -63,9 +63,24 @@ export function Textarea({ className, ...rest }: ComponentPropsWithoutRef<"texta
 }
 
 export function Select({ className, children, ...rest }: ComponentPropsWithoutRef<"select">) {
+  // Native control with a custom chevron; `color-scheme: dark` styles the popup.
   return (
-    <select className={cn("appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%239aa4b2%22><path d=%22M5.5 7.5l4.5 4.5 4.5-4.5%22 stroke=%22%239aa4b2%22 stroke-width=%221.5%22 fill=%22none%22/></svg>')] bg-[length:20px] bg-[right_12px_center] bg-no-repeat pr-10", className)} {...rest}>
-      {children}
-    </select>
+    <span className="relative block">
+      <select className={cn("appearance-none pr-10", className)} {...rest}>
+        {children}
+      </select>
+      <svg
+        aria-hidden
+        viewBox="0 0 20 20"
+        className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-muted"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5.5 7.5l4.5 4.5 4.5-4.5" />
+      </svg>
+    </span>
   );
 }

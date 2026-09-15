@@ -37,13 +37,20 @@ export default async function RolePage(props: PageProps<"/careers/[slug]">) {
   const role = await getRole(slug);
   if (!role) notFound();
 
+  const employmentType: Record<typeof role.meta.type, string> = {
+    "Full-time": "FULL_TIME",
+    "Part-time": "PART_TIME",
+    Contract: "CONTRACTOR",
+    Internship: "INTERN",
+  };
+
   const jsonLd: WithContext<JobPosting> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title: role.meta.title,
     description: role.meta.summary,
     datePosted: role.meta.posted,
-    employmentType: role.meta.type.toUpperCase().replace("-", "_"),
+    employmentType: employmentType[role.meta.type],
     hiringOrganization: { "@type": "Organization", name: site.name, sameAs: site.url },
     jobLocation: {
       "@type": "Place",

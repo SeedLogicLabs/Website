@@ -33,12 +33,12 @@ export async function insertWaitlistSignup(
     WITH recent AS (
       SELECT count(*)::int AS c
       FROM waitlist_signups
-      WHERE ip_hash = ${ipHash} AND created_at > now() - interval '1 hour'
+      WHERE ip_hash = ${ipHash}::text AND created_at > now() - interval '1 hour'
     ),
     ins AS (
       INSERT INTO waitlist_signups (email, product_slug, ip_hash)
-      SELECT ${data.email}, ${data.product}, ${ipHash}
-      WHERE (SELECT c FROM recent) < ${limit}
+      SELECT ${data.email}::text, ${data.product}::text, ${ipHash}::text
+      WHERE (SELECT c FROM recent) < ${limit}::int
       ON CONFLICT (email, product_slug) DO NOTHING
       RETURNING id
     )
@@ -57,12 +57,13 @@ export async function insertContactRequest(
     WITH recent AS (
       SELECT count(*)::int AS c
       FROM contact_requests
-      WHERE ip_hash = ${ipHash} AND created_at > now() - interval '1 hour'
+      WHERE ip_hash = ${ipHash}::text AND created_at > now() - interval '1 hour'
     ),
     ins AS (
       INSERT INTO contact_requests (name, email, company, interest, message, ip_hash)
-      SELECT ${data.name}, ${data.email}, ${data.company}, ${data.interest}, ${data.message}, ${ipHash}
-      WHERE (SELECT c FROM recent) < ${limit}
+      SELECT ${data.name}::text, ${data.email}::text, ${data.company}::text,
+             ${data.interest}::text, ${data.message}::text, ${ipHash}::text
+      WHERE (SELECT c FROM recent) < ${limit}::int
       RETURNING id
     )
     SELECT (SELECT c FROM recent) AS recent_count,
