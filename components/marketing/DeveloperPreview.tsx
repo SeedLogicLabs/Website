@@ -42,7 +42,7 @@ export function DeveloperPreview({ data }: { data: DeveloperPreviewData }) {
       </Reveal>
 
       <Reveal delay={0.1}>
-        <figure className="overflow-hidden rounded-2xl border border-line bg-[#0a0e15] shadow-glow">
+        <figure className="overflow-hidden rounded-2xl border border-line bg-ink shadow-glow">
           <figcaption className="flex items-center gap-2 border-b border-line px-4 py-2.5 font-mono text-xs text-faint">
             <span aria-hidden className="flex gap-1.5">
               <span className="size-2.5 rounded-full bg-line-strong" />

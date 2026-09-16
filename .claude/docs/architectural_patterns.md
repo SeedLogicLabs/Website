@@ -43,7 +43,7 @@ Dynamic segments always ship `generateStaticParams` + `export const dynamicParam
 
 ## 3. Design tokens flow layout → globals.css → utilities
 
-- `app/layout.tsx` loads Geist and Geist Mono with `next/font` `variable:` names and puts them on
+- `app/layout.tsx` loads Inter and Geist Mono with `next/font` `variable:` names and puts them on
   `<html>`.
 - `app/globals.css` declares every color, font, radius and shadow inside `@theme` (Tailwind v4 is
   CSS-first; there is no `tailwind.config`). Custom utilities (`text-gradient`,
@@ -54,7 +54,11 @@ Dynamic segments always ship `generateStaticParams` + `export const dynamicParam
   cannot use the stylesheet.
 - The site is dark-only: `color-scheme: dark` on `:root`; there is no light theme or toggle.
 - Contrast is part of the token set: `--color-faint` is the dimmest text allowed on `ink`
-  (5.5:1). Buttons on the accent gradient use `text-ink`.
+  (6.2:1; 4.9:1 on `raised`). Buttons on the accent gradient use `text-ink` (6.7:1 on orange);
+  white on orange is only 2.7:1, so never put `text-text` on accent surfaces.
+  Brand colors: primary orange `#fa6c12` (`accent`), secondary navy `#0a1045` (`surface`, with
+  `ink` and `raised` derived darker and lighter in the same hue). `amber` marks research-phase
+  and draft states so it stays distinct from the orange accent.
 
 ## 4. Motion is progressive enhancement
 

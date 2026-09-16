@@ -42,7 +42,7 @@ Next.js 16 differs from older training data: read the matching guide under
 - `lib/` `db/` (schema, lazy client, atomic insert SQL) · `forms/` (pipeline, state, IP hashing) ·
   `validation/` (Zod schemas, Zod-free `interests.ts`) · `content/` (MDX loaders, schemas) ·
   `og.tsx` (shared OG renderer) · `cn.ts`.
-- `drizzle/` committed SQL migrations. `assets/fonts/` Geist TTF for OG images (OFL).
+- `drizzle/` committed SQL migrations. `assets/fonts/` Inter SemiBold TTF for OG images (OFL).
 - `tests/e2e/` Playwright. Unit tests are colocated `*.test.ts(x)`.
 - `.claude/docs/` extended docs (see below). `.next/`, `next-env.d.ts` are generated; never edit.
 

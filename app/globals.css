@@ -6,26 +6,26 @@
  * (bg-ink, text-muted, border-line, from-accent, font-mono, ...).
  */
 @theme {
-  --color-ink: #070a0f;
-  --color-surface: #0d1117;
-  --color-raised: #141b26;
+  --color-ink: #05082a;
+  --color-surface: #0a1045;
+  --color-raised: #161d5c;
   --color-line: rgba(255, 255, 255, 0.08);
   --color-line-strong: rgba(255, 255, 255, 0.16);
-  --color-text: #f3f5f7;
-  --color-muted: #9aa4b2;
-  --color-faint: #7b8794; /* 5.5:1 on ink, passes AA at 12px */
-  --color-accent: #34d399;
-  --color-accent-2: #22d3ee;
-  --color-amber: #fbbf24;
+  --color-text: #f4f5fb;
+  --color-muted: #a4abc9;
+  --color-faint: #8790b3; /* 6.2:1 on ink, 4.9:1 on raised, passes AA at 12px */
+  --color-accent: #fa6c12;
+  --color-accent-2: #ffa14a;
+  --color-amber: #ffd23d;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
 
-  --shadow-glow: 0 0 0 1px rgba(52, 211, 153, 0.25),
-    0 20px 60px -20px rgba(52, 211, 153, 0.35);
+  --shadow-glow: 0 0 0 1px rgba(250, 108, 18, 0.25),
+    0 20px 60px -20px rgba(250, 108, 18, 0.35);
 }
 
 :root {
@@ -45,7 +45,7 @@ body {
 }
 
 ::selection {
-  background: rgba(52, 211, 153, 0.35);
+  background: rgba(250, 108, 18, 0.35);
 }
 
 :focus-visible {
@@ -88,12 +88,12 @@ body {
   background-image:
     radial-gradient(
       60% 50% at 50% 0%,
-      rgba(52, 211, 153, 0.18),
+      rgba(250, 108, 18, 0.18),
       transparent 70%
     ),
     radial-gradient(
       40% 40% at 80% 20%,
-      rgba(34, 211, 238, 0.12),
+      rgba(255, 161, 74, 0.12),
       transparent 70%
     );
 }

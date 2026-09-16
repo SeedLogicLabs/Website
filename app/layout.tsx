@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import type { Organization, WithContext } from "schema-dts";
 import "./globals.css";
 import { site } from "@/content/site";
@@ -8,8 +8,8 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { CfAnalytics } from "@/components/analytics/CfAnalytics";
 import { JsonLd } from "@/components/seo/JsonLd";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -76,7 +76,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         {/* Without JavaScript, scroll-reveal blocks must still be readable. */}
