@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { site } from "@/content/site";
+import { LogoGlyph } from "@/components/layout/LogoGlyph";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
@@ -41,15 +42,7 @@ export async function renderOgImage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <svg width="52" height="52" viewBox="0 0 32 32" fill="none">
-            <circle cx="16" cy="25" r="3" stroke="#fa6c12" strokeWidth="2" />
-            <path d="M8 25h5M19 25h5" stroke="#fa6c12" strokeWidth="2" strokeLinecap="round" />
-            <circle cx="6" cy="25" r="1.5" fill="#fa6c12" />
-            <circle cx="26" cy="25" r="1.5" fill="#fa6c12" />
-            <path d="M16 22V11" stroke="#ffa14a" strokeWidth="2" strokeLinecap="round" />
-            <path d="M16 15c0-4.5 3.5-7.5 8-7.5 0 4.5-3.5 7.5-8 7.5Z" fill="#ffa14a" />
-            <path d="M16 11c0-3.5-2.8-6-6.5-6 0 3.5 2.8 6 6.5 6Z" fill="#fa6c12" />
-          </svg>
+          <LogoGlyph color="#fa6c12" width={52} height={52} />
           <div style={{ display: "flex", fontSize: 30 }}>
             <span>SeedLogic</span>
             <span style={{ color: "#a4abc9", marginLeft: 10 }}>Labs</span>
