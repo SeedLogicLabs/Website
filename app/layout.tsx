@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import type { Organization, WithContext } from "schema-dts";
 import "./globals.css";
@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { CfAnalytics } from "@/components/analytics/CfAnalytics";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { THEME_COLOR, themeInitScript } from "@/lib/theme";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -55,6 +56,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+// Follows the OS preference; a stored toggle choice does not update this meta.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_COLOR.light },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR.dark },
+  ],
+};
+
 const organization: WithContext<Organization> = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -76,16 +85,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      // The init script sets data-theme before hydration.
+      suppressHydrationWarning
       className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        {/* Without JavaScript, scroll-reveal blocks must still be readable. */}
+        {/* Applies the stored or OS theme before any content paints. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {/* Without JavaScript, scroll-reveal blocks must still be readable and
+            the theme toggle (which needs JS) is hidden. */}
         <noscript>
-          <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-theme-toggle]{display:none}`}</style>
         </noscript>
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-ink"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-on-accent"
         >
           Skip to content
         </a>

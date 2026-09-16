@@ -21,7 +21,7 @@ export function SubmitButton({
         <>
           <span
             aria-hidden
-            className="size-4 animate-spin rounded-full border-2 border-ink/30 border-t-ink"
+            className="size-4 animate-spin rounded-full border-2 border-on-accent/30 border-t-on-accent"
           />
           {pendingText}
         </>

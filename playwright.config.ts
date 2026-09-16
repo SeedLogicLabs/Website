@@ -18,6 +18,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
+    // Playwright defaults to light. Pin the brand theme so the route, nav and
+    // form suites stay comparable; tests/e2e/theme.spec.ts covers light.
+    colorScheme: "dark",
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },

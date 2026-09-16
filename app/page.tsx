@@ -22,7 +22,7 @@ export default function Home() {
           <>
             Everything here is built in-house and still in progress. Join a
             waitlist to get in early, or{" "}
-            <Link href="/contact" className="text-accent underline underline-offset-4 hover:text-accent-2">
+            <Link href="/contact" className="text-accent-text underline underline-offset-4 hover:text-accent-text-hover">
               talk to us
             </Link>{" "}
             about the SDK.

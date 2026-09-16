@@ -7,11 +7,11 @@ type Variant = "primary" | "secondary" | "ghost";
 type Size = "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:opacity-60 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-text focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:opacity-60 disabled:pointer-events-none";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-accent-gradient text-ink hover:brightness-110 shadow-[0_10px_30px_-12px_rgba(250,108,18,0.5)]",
+    "bg-accent-gradient text-on-accent hover:brightness-110 shadow-cta",
   secondary:
     "border border-line-strong bg-surface/60 text-text hover:border-accent/60 hover:bg-raised",
   ghost: "text-muted hover:text-text hover:bg-raised",

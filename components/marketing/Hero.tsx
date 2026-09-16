@@ -48,7 +48,7 @@ export function Hero() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-medium text-text">{p.name}</span>
-                  <span aria-hidden className="text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-accent">
+                  <span aria-hidden className="text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-accent-text">
                     &rarr;
                   </span>
                 </div>

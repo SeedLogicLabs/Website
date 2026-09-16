@@ -42,7 +42,7 @@ export function ProductCard({
           <dd className="mt-1 text-muted">{product.audience}</dd>
         </div>
       </dl>
-      <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-accent">
+      <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-accent-text">
         Learn more <span aria-hidden>&rarr;</span>
       </span>
     </Card>

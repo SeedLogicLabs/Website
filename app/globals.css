@@ -1,22 +1,142 @@
 @import "tailwindcss";
 
 /*
- * SeedLogic Labs design tokens. Dark-only theme.
- * Tailwind v4 is CSS-first: every token below becomes a utility
- * (bg-ink, text-muted, border-line, from-accent, font-mono, ...).
+ * SeedLogic Labs design tokens. Dual theme: dark is the brand default, light
+ * follows the OS or the header toggle (`data-theme` on <html>, set before
+ * paint by `themeInitScript` in lib/theme.ts).
+ *
+ * Three layers:
+ *   1. Raw palette as plain custom properties on :root (dark) and in the two
+ *      light blocks below. The light blocks must stay identical; a unit test
+ *      in lib/theme.test.ts guards the duplication.
+ *   2. `@theme inline` maps them into Tailwind's namespace so every token
+ *      becomes a utility (bg-ink, text-muted, border-line, shadow-glow, ...).
+ *      `inline` makes `bg-ink/80` compile to
+ *      color-mix(in oklab, var(--ink) 80%, transparent), so opacity
+ *      modifiers follow the active theme.
+ *   3. Custom @utility blocks reference the raw vars.
+ *
+ * Accent rule: `accent` / `accent-2` are FILL colours and stay the bright
+ * brand orange in both themes (they match the logo and OG images).
+ * `accent-text` is for orange glyphs and darkens in light mode, because
+ * #fa6c12 is only 2.9:1 on white. `on-accent` is the fixed navy for text
+ * placed on an accent fill (6.7:1 on orange in both themes). Never put
+ * text-text on an accent fill or text-accent on a page surface.
  */
-@theme {
-  --color-ink: #05082a;
-  --color-surface: #0a1045;
-  --color-raised: #161d5c;
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.16);
-  --color-text: #f4f5fb;
-  --color-muted: #a4abc9;
-  --color-faint: #8790b3; /* 6.2:1 on ink, 4.9:1 on raised, passes AA at 12px */
-  --color-accent: #fa6c12;
-  --color-accent-2: #ffa14a;
-  --color-amber: #ffd23d;
+
+/* Variant for the toggle icons. Only fires when JS has set data-theme. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
+/* 1. Raw palette. Dark is the default and the fallback when there is no OS
+   preference and no stored choice. */
+:root {
+  color-scheme: dark;
+
+  --ink: #05082a;
+  --surface: #0a1045;
+  --raised: #161d5c;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --text: #f4f5fb;
+  --muted: #a4abc9;
+  --faint: #8790b3; /* 6.2:1 on ink, 4.9:1 on raised, passes AA at 12px */
+
+  --accent: #fa6c12; /* fill, fixed in both themes */
+  --accent-2: #ffa14a; /* fill, fixed in both themes */
+  --accent-text: #fa6c12;
+  --accent-text-hover: #ffa14a;
+  --amber: #ffd23d; /* fill: research-phase and draft states */
+  --amber-text: #ffd23d;
+  --on-accent: #05082a; /* text on accent fills, fixed in both themes */
+  --danger: #f87171;
+
+  --dot: rgba(255, 255, 255, 0.09);
+  --glow-1: rgba(250, 108, 18, 0.18);
+  --glow-2: rgba(255, 161, 74, 0.12);
+  --gradient-from: var(--accent);
+  --gradient-to: var(--accent-2);
+  --glow-shadow: 0 0 0 1px rgba(250, 108, 18, 0.25),
+    0 20px 60px -20px rgba(250, 108, 18, 0.35);
+  --cta-shadow: 0 10px 30px -12px rgba(250, 108, 18, 0.5);
+}
+
+/* 2a. Stored choice: light. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --ink: #f4f5fb;
+  --surface: #ffffff;
+  --raised: #e6e9f5;
+  --line: rgba(10, 16, 69, 0.1);
+  --line-strong: rgba(10, 16, 69, 0.2);
+  --text: #0a1045;
+  --muted: #4a5180; /* 6.9:1 on ink, 6.2:1 on raised */
+  --faint: #5d648e; /* 5.3:1 on ink, 4.7:1 on raised */
+
+  --accent-text: #a34409; /* 5.7:1 on ink, 5.1:1 on raised */
+  --accent-text-hover: #7f3507;
+  --amber-text: #7d5200; /* 6.8:1 on surface */
+  --danger: #b42318;
+
+  --dot: rgba(10, 16, 69, 0.1);
+  --glow-1: rgba(250, 108, 18, 0.14);
+  --glow-2: rgba(255, 161, 74, 0.1);
+  --gradient-from: #a34409;
+  --gradient-to: #d95d0e;
+  --glow-shadow: 0 0 0 1px rgba(250, 108, 18, 0.25),
+    0 20px 60px -20px rgba(250, 108, 18, 0.25);
+  --cta-shadow: 0 10px 30px -12px rgba(250, 108, 18, 0.35);
+}
+
+/* 2b. OS preference: light, unless the stored choice is dark. This is the
+   JS-off path. Keep identical to 2a. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+
+    --ink: #f4f5fb;
+    --surface: #ffffff;
+    --raised: #e6e9f5;
+    --line: rgba(10, 16, 69, 0.1);
+    --line-strong: rgba(10, 16, 69, 0.2);
+    --text: #0a1045;
+    --muted: #4a5180; /* 6.9:1 on ink, 6.2:1 on raised */
+    --faint: #5d648e; /* 5.3:1 on ink, 4.7:1 on raised */
+
+    --accent-text: #a34409; /* 5.7:1 on ink, 5.1:1 on raised */
+    --accent-text-hover: #7f3507;
+    --amber-text: #7d5200; /* 6.8:1 on surface */
+    --danger: #b42318;
+
+    --dot: rgba(10, 16, 69, 0.1);
+    --glow-1: rgba(250, 108, 18, 0.14);
+    --glow-2: rgba(255, 161, 74, 0.1);
+    --gradient-from: #a34409;
+    --gradient-to: #d95d0e;
+    --glow-shadow: 0 0 0 1px rgba(250, 108, 18, 0.25),
+      0 20px 60px -20px rgba(250, 108, 18, 0.25);
+    --cta-shadow: 0 10px 30px -12px rgba(250, 108, 18, 0.35);
+  }
+}
+
+/* 3. Tailwind namespace. */
+@theme inline {
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-text: var(--accent-text);
+  --color-accent-text-hover: var(--accent-text-hover);
+  --color-amber: var(--amber);
+  --color-amber-text: var(--amber-text);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
@@ -24,12 +144,8 @@
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
 
-  --shadow-glow: 0 0 0 1px rgba(250, 108, 18, 0.25),
-    0 20px 60px -20px rgba(250, 108, 18, 0.35);
-}
-
-:root {
-  color-scheme: dark;
+  --shadow-glow: var(--glow-shadow);
+  --shadow-cta: var(--cta-shadow);
 }
 
 html {
@@ -37,19 +153,19 @@ html {
 }
 
 body {
-  background-color: var(--color-ink);
-  color: var(--color-text);
+  background-color: var(--ink);
+  color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: rgba(250, 108, 18, 0.35);
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--accent-text);
   outline-offset: 2px;
 }
 
@@ -57,45 +173,35 @@ body {
 @utility text-gradient {
   background-image: linear-gradient(
     100deg,
-    var(--color-accent) 0%,
-    var(--color-accent-2) 100%
+    var(--gradient-from) 0%,
+    var(--gradient-to) 100%
   );
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
 }
 
-/* Accent gradient surface (buttons, rules). */
+/* Accent gradient surface (buttons, rules). Always the bright fill so
+   `text-on-accent` keeps its contrast. */
 @utility bg-accent-gradient {
   background-image: linear-gradient(
     100deg,
-    var(--color-accent) 0%,
-    var(--color-accent-2) 100%
+    var(--accent) 0%,
+    var(--accent-2) 100%
   );
 }
 
 /* Dot grid backdrop used in hero and CTA bands. CSS only, no JS. */
 @utility bg-dot-grid {
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.09) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 /* Radial glow behind hero content. */
 @utility bg-hero-glow {
   background-image:
-    radial-gradient(
-      60% 50% at 50% 0%,
-      rgba(250, 108, 18, 0.18),
-      transparent 70%
-    ),
-    radial-gradient(
-      40% 40% at 80% 20%,
-      rgba(255, 161, 74, 0.12),
-      transparent 70%
-    );
+    radial-gradient(60% 50% at 50% 0%, var(--glow-1), transparent 70%),
+    radial-gradient(40% 40% at 80% 20%, var(--glow-2), transparent 70%);
 }
 
 /* CSS-only entrance for above-the-fold content. Content is visible in

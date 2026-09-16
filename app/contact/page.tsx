@@ -67,7 +67,7 @@ export default function ContactPage() {
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-faint">Email</p>
               <a
                 href={`mailto:${site.email}`}
-                className="mt-2 block break-all text-xl font-semibold tracking-tight text-text hover:text-accent"
+                className="mt-2 block break-all text-xl font-semibold tracking-tight text-text hover:text-accent-text"
               >
                 {site.email}
               </a>

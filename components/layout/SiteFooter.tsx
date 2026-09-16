@@ -17,7 +17,7 @@ export function SiteFooter() {
           </p>
           <a
             href={`mailto:${site.email}`}
-            className="mt-4 inline-block font-mono text-sm text-accent hover:underline"
+            className="mt-4 inline-block font-mono text-sm text-accent-text hover:underline"
           >
             {site.email}
           </a>

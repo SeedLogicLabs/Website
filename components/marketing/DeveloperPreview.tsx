@@ -28,7 +28,7 @@ export function DeveloperPreview({ data }: { data: DeveloperPreviewData }) {
         <ol className="mt-3 space-y-3">
           {data.steps.map((s, i) => (
             <li key={s} className="flex gap-3 text-sm leading-6 text-muted">
-              <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-mono text-[11px] text-accent">
+              <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-mono text-[11px] text-accent-text">
                 {i + 1}
               </span>
               <span>{s}</span>
