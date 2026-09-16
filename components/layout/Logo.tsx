@@ -19,7 +19,7 @@ export function LogoMark({
       fill="none"
     >
       <defs>
-        <linearGradient id="slg" x1="4" y1="28" x2="28" y2="4">
+        <linearGradient id="slg" gradientUnits="userSpaceOnUse" x1="4" y1="28" x2="28" y2="4">
           <stop offset="0" stopColor="#fa6c12" />
           <stop offset="1" stopColor="#ffa14a" />
         </linearGradient>
