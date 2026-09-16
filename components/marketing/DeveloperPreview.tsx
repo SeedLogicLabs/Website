@@ -28,7 +28,7 @@ export function DeveloperPreview({ data }: { data: DeveloperPreviewData }) {
         <ol className="mt-3 space-y-3">
           {data.steps.map((s, i) => (
             <li key={s} className="flex gap-3 text-sm leading-6 text-muted">
-              <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-mono text-[11px] text-accent">
+              <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-mono text-[11px] text-accent-text">
                 {i + 1}
               </span>
               <span>{s}</span>
@@ -42,7 +42,7 @@ export function DeveloperPreview({ data }: { data: DeveloperPreviewData }) {
       </Reveal>
 
       <Reveal delay={0.1}>
-        <figure className="overflow-hidden rounded-2xl border border-line bg-[#0a0e15] shadow-glow">
+        <figure className="overflow-hidden rounded-2xl border border-line bg-ink shadow-glow">
           <figcaption className="flex items-center gap-2 border-b border-line px-4 py-2.5 font-mono text-xs text-faint">
             <span aria-hidden className="flex gap-1.5">
               <span className="size-2.5 rounded-full bg-line-strong" />

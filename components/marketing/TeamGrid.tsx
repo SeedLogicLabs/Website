@@ -15,7 +15,7 @@ export function TeamGrid() {
           <Card className="flex items-center gap-4 p-5">
             <span
               aria-hidden
-              className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-accent-gradient font-mono text-sm font-semibold text-ink"
+              className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-accent-gradient font-mono text-sm font-semibold text-on-accent"
             >
               {m.initials}
             </span>

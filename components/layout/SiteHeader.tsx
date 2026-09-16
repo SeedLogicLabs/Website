@@ -4,6 +4,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Logo } from "./Logo";
 import { NavLink } from "./NavLink";
 import { MobileNav } from "./MobileNav";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
   return (
@@ -25,13 +26,15 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
-          <ButtonLink href="/contact" size="md">
-            Talk to us
-          </ButtonLink>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <div className="hidden md:block">
+            <ButtonLink href="/contact" size="md">
+              Talk to us
+            </ButtonLink>
+          </div>
+          <MobileNav />
         </div>
-
-        <MobileNav />
       </div>
     </header>
   );

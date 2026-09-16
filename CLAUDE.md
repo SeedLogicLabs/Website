@@ -18,7 +18,7 @@ pending legal review.
 | Framework | Next.js 16.3 App Router, Turbopack, `typedRoutes` | `next.config.ts` |
 | UI | React 19.2, Server Components by default | `app/**` |
 | Language | TypeScript 5 strict, `@/*` alias to repo root | `tsconfig.json:21` |
-| Styling | Tailwind CSS v4, CSS-first tokens in `@theme`, dark-only | `app/globals.css:8` |
+| Styling | Tailwind CSS v4, CSS-first tokens via `@theme inline`; dark default, light via `data-theme` + `prefers-color-scheme` | `app/globals.css`, `lib/theme.ts` |
 | Motion | `motion` (Framer Motion) in one client leaf | `components/motion/Reveal.tsx` |
 | Content | TS data + MDX via `@next/mdx` with `export const metadata` | `content/`, `mdx-components.tsx` |
 | Data | Drizzle ORM + `@neondatabase/serverless` (neon-http) | `lib/db/` |
@@ -42,7 +42,7 @@ Next.js 16 differs from older training data: read the matching guide under
 - `lib/` `db/` (schema, lazy client, atomic insert SQL) · `forms/` (pipeline, state, IP hashing) ·
   `validation/` (Zod schemas, Zod-free `interests.ts`) · `content/` (MDX loaders, schemas) ·
   `og.tsx` (shared OG renderer) · `cn.ts`.
-- `drizzle/` committed SQL migrations. `assets/fonts/` Geist TTF for OG images (OFL).
+- `drizzle/` committed SQL migrations. `assets/fonts/` Inter SemiBold TTF for OG images (OFL).
 - `tests/e2e/` Playwright. Unit tests are colocated `*.test.ts(x)`.
 - `.claude/docs/` extended docs (see below). `.next/`, `next-env.d.ts` are generated; never edit.
 
@@ -72,6 +72,8 @@ production fails closed without it), `NEXT_PUBLIC_CF_BEACON_TOKEN` (optional). N
 - Keep pages Server Components; add `"use client"` only to small leaves (see patterns doc §1).
 - Never import `server-only` modules (`lib/db/*`, `app/actions/*`, `lib/forms/ip-hash.server.ts`)
   from client components or Vitest tests.
+- Orange text uses `text-accent-text`; text on an orange fill uses `text-on-accent`; fills keep
+  `bg-accent`. Both themes must pass the contrast tests in `lib/theme.test.ts`.
 - Keep Zod out of client bundles: client forms import constants from `lib/validation/interests.ts`
   and only types from the schema files.
 - New product, post or role: edit `content/`, not components (`content_authoring.md`).

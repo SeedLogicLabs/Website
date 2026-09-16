@@ -33,7 +33,7 @@ export function PostCard({ post, featured = false }: { post: Post; featured?: bo
           ))}
         </ul>
       ) : null}
-      <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-accent">
+      <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-accent-text">
         Read post <span aria-hidden>&rarr;</span>
       </span>
     </Card>

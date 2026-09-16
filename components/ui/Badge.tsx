@@ -5,8 +5,8 @@ import { STATUS_LABEL, type ProductStatus } from "@/content/products";
 type Tone = "accent" | "amber" | "neutral";
 
 const tones: Record<Tone, string> = {
-  accent: "border-accent/30 bg-accent/10 text-accent",
-  amber: "border-amber/30 bg-amber/10 text-amber",
+  accent: "border-accent/30 bg-accent/10 text-accent-text",
+  amber: "border-amber/30 bg-amber/10 text-amber-text",
   neutral: "border-line-strong bg-raised text-muted",
 };
 

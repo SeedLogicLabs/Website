@@ -19,7 +19,7 @@ export function JobCard({ role }: { role: Role }) {
         <p className="mt-1 text-sm text-muted">{role.meta.summary}</p>
         <p className="mt-2 font-mono text-xs text-faint">{role.meta.location}</p>
       </div>
-      <span className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-accent">
+      <span className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-accent-text">
         View role <span aria-hidden>&rarr;</span>
       </span>
     </Card>

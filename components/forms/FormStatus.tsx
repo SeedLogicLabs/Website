@@ -12,7 +12,7 @@ export function FormStatus({ state, className }: { state: ActionState; className
         "flex items-start gap-3 rounded-xl border px-4 py-3 text-sm",
         ok
           ? "border-accent/30 bg-accent/10 text-text"
-          : "border-red-400/30 bg-red-400/10 text-text",
+          : "border-danger/30 bg-danger/10 text-text",
         className,
       )}
     >
@@ -20,7 +20,9 @@ export function FormStatus({ state, className }: { state: ActionState; className
         aria-hidden
         className={cn(
           "mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-          ok ? "bg-accent text-ink" : "bg-red-400 text-ink",
+          // `danger` flips lightness with the theme, so `ink` stays legible on it
+          // (7.1:1 dark, 6.0:1 light).
+          ok ? "bg-accent text-on-accent" : "bg-danger text-ink",
         )}
       >
         {ok ? "✓" : "!"}

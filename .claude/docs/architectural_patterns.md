@@ -9,6 +9,7 @@ Every route under `app/` is a prerendered Server Component (`next build` shows `
 them). Client Components carry `"use client"` at the top and are small leaves:
 
 - `components/layout/MobileNav.tsx`, `NavLink.tsx` (state, `usePathname`)
+- `components/layout/ThemeToggle.tsx` (`useSyncExternalStore` over `data-theme` on `<html>`)
 - `components/forms/WaitlistForm.tsx`, `ContactForm.tsx`, `SubmitButton.tsx` (`useActionState`,
   `useFormStatus`)
 - `components/motion/Reveal.tsx` (Framer Motion)
@@ -16,7 +17,8 @@ them). Client Components carry `"use client"` at the top and are small leaves:
 
 Rules that follow:
 - A Server Component passes server-rendered content into a client leaf via `children`
-  (`Reveal` wraps cards; the header stays a Server Component and only `MobileNav` is client).
+  (`Reveal` wraps cards; the header stays a Server Component and only `MobileNav` and
+  `ThemeToggle` are client).
 - Request-time data that would make a route dynamic is read on the client instead:
   `ContactForm` reads `?interest=` with `useSearchParams` inside a `<Suspense>` in
   `app/contact/page.tsx`, so `/contact` stays static. Do not convert it to `searchParams`.
@@ -41,20 +43,41 @@ There is no CMS. Two kinds of content:
 Dynamic segments always ship `generateStaticParams` + `export const dynamicParams = false`
 (`app/products/[slug]/page.tsx`, `app/blog/[slug]/page.tsx`, `app/careers/[slug]/page.tsx`).
 
-## 3. Design tokens flow layout → globals.css → utilities
+## 3. Design tokens flow layout → globals.css → utilities, in two themes
 
-- `app/layout.tsx` loads Geist and Geist Mono with `next/font` `variable:` names and puts them on
+- `app/layout.tsx` loads Inter and Geist Mono with `next/font` `variable:` names and puts them on
   `<html>`.
-- `app/globals.css` declares every color, font, radius and shadow inside `@theme` (Tailwind v4 is
-  CSS-first; there is no `tailwind.config`). Custom utilities (`text-gradient`,
-  `bg-accent-gradient`, `bg-dot-grid`, `bg-hero-glow`, `animate-rise`) are defined with
-  `@utility` in the same file.
-- Components use only generated utilities (`bg-ink`, `text-muted`, `border-line`, `font-mono`).
-  No hex values in TSX, except the OG renderer (`lib/og.tsx`) and `app/global-error.tsx`, which
-  cannot use the stylesheet.
-- The site is dark-only: `color-scheme: dark` on `:root`; there is no light theme or toggle.
-- Contrast is part of the token set: `--color-faint` is the dimmest text allowed on `ink`
-  (5.5:1). Buttons on the accent gradient use `text-ink`.
+- `app/globals.css` has three layers. (1) The raw palette as plain custom properties (`--ink`,
+  `--text`, `--accent-text`, ...) on `:root` (dark, the default) and in two identical light blocks:
+  `:root[data-theme="light"]` (stored choice) and `@media (prefers-color-scheme: light)
+  :root:not([data-theme="dark"])` (OS preference, works without JS). `lib/theme.test.ts` asserts
+  the two light blocks match. (2) `@theme inline` maps them into Tailwind's namespace, so every
+  token is a utility (`bg-ink`, `text-muted`, `shadow-glow`) and opacity modifiers compile to
+  `color-mix(in oklab, var(--ink) 80%, transparent)`, which follows the active theme. (3) Custom
+  utilities (`text-gradient`, `bg-accent-gradient`, `bg-dot-grid`, `bg-hero-glow`, `animate-rise`)
+  are defined with `@utility` and reference the raw vars. There is no `tailwind.config`.
+- Theme selection: `lib/theme.ts` exports `themeInitScript`, inlined as the first child of `<body>`
+  so `data-theme` is set before first paint (stored `localStorage.theme`, else OS, else dark).
+  `<html>` has `suppressHydrationWarning` for that attribute. `ThemeToggle` flips and persists it;
+  `color-scheme` follows the theme so native controls match. `viewport.themeColor` follows the OS
+  only. A `light` custom variant (`light:hidden`) exists for the toggle icons; `dark:` is unused.
+- Components use only generated utilities. No hex values in TSX, except the OG renderer
+  (`lib/og.tsx`), `app/global-error.tsx` (cannot use the stylesheet), `components/layout/LogoGlyph.tsx`
+  (fixed brand mark) and `THEME_COLOR` in `lib/theme.ts` (mirrors `--ink`).
+- Accent rule. `accent`/`accent-2`/`amber` are **fills** and stay the bright brand colours in both
+  themes (`bg-accent`, `bg-accent/10`, `border-accent/30`, `bg-accent-gradient`, badge dots).
+  `accent-text`/`accent-text-hover`/`amber-text` are for **glyphs** and darken in light mode
+  (`#a34409`), because `#fa6c12` is only 2.9:1 on white. `on-accent` is the fixed navy for text on
+  an accent fill (6.7:1 on orange in both themes). Never `text-accent` on a page surface, never
+  `text-text` or `text-ink` on an accent fill. Focus rings use `accent-text` (bright orange is
+  under the 3:1 UI floor on white). `danger` replaces Tailwind's `red-*` for form errors.
+- Contrast is part of the token set and is asserted for both themes in `lib/theme.test.ts` using
+  `lib/contrast.ts` (AA 4.5:1 for text, 3:1 for large text and UI). Dark: `faint` is 6.2:1 on
+  `ink`, 4.9:1 on `raised`. Light: `muted` 6.9:1 on `ink`, `faint` 4.7:1 on `raised`,
+  `accent-text` 5.7:1 on `ink` and 4.7:1 on a `bg-accent/10` badge over `raised`.
+  Brand colours: primary orange `#fa6c12` (`accent`), secondary navy `#0a1045` (`surface` in dark,
+  `text` in light). `amber` marks research-phase and draft states so it stays distinct from the
+  orange accent.
 
 ## 4. Motion is progressive enhancement
 
@@ -137,10 +160,13 @@ hrefs; navigation data is typed as `{ href: Route; label }` in `content/site.ts`
   content invariants, small component renders. Nothing that imports `server-only` modules.
 - **Playwright** (`tests/e2e`, desktop + Pixel 7 projects, port 3100): every fixed route renders
   with one `h1` and no console errors; content routes are discovered from the live sitemap;
-  form validation errors; happy-path form tests run only with `E2E_DATABASE_URL`.
+  form validation errors; happy-path form tests run only with `E2E_DATABASE_URL`. `colorScheme`
+  is pinned to `dark` in `playwright.config.ts`; `theme.spec.ts` emulates light explicitly and
+  checks the toggle persists across reloads.
 - Lighthouse is run manually against `next start` (see `deployment.md`).
 
 ## Not present, by design
 
-No light theme, no CMS, no admin UI for submissions, no client-side data fetching, no global
-state library, no i18n, no `proxy.ts`/middleware, no `output: 'export'`.
+No CMS, no admin UI for submissions, no client-side data fetching, no global
+state library, no i18n, no `proxy.ts`/middleware, no `output: 'export'`, no third "system" option in the theme
+toggle (clearing `localStorage.theme` returns to following the OS).

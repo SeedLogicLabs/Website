@@ -2,7 +2,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 const control =
-  "w-full rounded-xl border border-line bg-ink/60 px-4 py-3 text-base text-text placeholder:text-faint transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 aria-invalid:border-red-400/70 aria-invalid:focus:ring-red-400/30 disabled:opacity-60";
+  "w-full rounded-xl border border-line bg-ink/60 px-4 py-3 text-base text-text placeholder:text-faint transition-colors hover:border-line-strong focus:border-accent-text focus:outline-none focus:ring-2 focus:ring-accent-text/30 aria-invalid:border-danger/70 aria-invalid:focus:ring-danger/30 disabled:opacity-60";
 
 type FieldProps = {
   id: string;
@@ -46,7 +46,7 @@ export function Field({ id, label, hint, errors, optional, children }: FieldProp
         </p>
       ) : null}
       {hasError ? (
-        <p id={errorId} role="alert" className="text-sm text-red-300">
+        <p id={errorId} role="alert" className="text-sm text-danger">
           {errors![0]}
         </p>
       ) : null}
@@ -63,7 +63,7 @@ export function Textarea({ className, ...rest }: ComponentPropsWithoutRef<"texta
 }
 
 export function Select({ className, children, ...rest }: ComponentPropsWithoutRef<"select">) {
-  // Native control with a custom chevron; `color-scheme: dark` styles the popup.
+  // Native control with a custom chevron; `color-scheme` follows the active theme, so the popup matches.
   return (
     <span className="relative block">
       <select className={cn("appearance-none pr-10", className)} {...rest}>

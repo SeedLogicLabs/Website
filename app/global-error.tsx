@@ -19,23 +19,23 @@ export default function GlobalError({
           minHeight: "100vh",
           display: "grid",
           placeItems: "center",
-          background: "#070a0f",
-          color: "#f3f5f7",
+          background: "#05082a",
+          color: "#f4f5fb",
           fontFamily: "ui-sans-serif, system-ui, sans-serif",
           textAlign: "center",
           padding: 24,
         }}
       >
         <div>
-          <p style={{ color: "#34d399", fontFamily: "ui-monospace, monospace", fontSize: 12, letterSpacing: 3 }}>
+          <p style={{ color: "#fa6c12", fontFamily: "ui-monospace, monospace", fontSize: 12, letterSpacing: 3 }}>
             SEEDLOGIC LABS
           </p>
           <h1 style={{ fontSize: 32, margin: "12px 0 8px" }}>Something broke.</h1>
-          <p style={{ color: "#9aa4b2", maxWidth: 420, margin: "0 auto" }}>
+          <p style={{ color: "#a4abc9", maxWidth: 420, margin: "0 auto" }}>
             The page could not be rendered. Please try again.
           </p>
           {error.digest ? (
-            <p style={{ color: "#7b8794", fontFamily: "ui-monospace, monospace", fontSize: 12 }}>
+            <p style={{ color: "#8790b3", fontFamily: "ui-monospace, monospace", fontSize: 12 }}>
               ref {error.digest}
             </p>
           ) : null}
@@ -47,8 +47,8 @@ export default function GlobalError({
               padding: "12px 22px",
               borderRadius: 999,
               border: 0,
-              background: "linear-gradient(100deg,#34d399,#22d3ee)",
-              color: "#070a0f",
+              background: "linear-gradient(100deg,#fa6c12,#ffa14a)",
+              color: "#05082a",
               fontWeight: 600,
               cursor: "pointer",
             }}
