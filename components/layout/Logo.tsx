@@ -2,9 +2,8 @@ import { cn } from "@/lib/cn";
 import { LogoGlyph } from "./LogoGlyph";
 
 /**
- * SeedLogic Labs mark: a sprout stacked over a circuit node.
- * Inline SVG in the accent colour by default; it inherits `currentColor`,
- * so pass a `text-*` class to recolour it. No network request.
+ * SeedLogic Labs mark: two leaves over a circuit node, in fixed brand colours.
+ * Inline SVG, so no network request; size it with a `size-*` class.
  */
 export function LogoMark({
   className,
@@ -16,7 +15,7 @@ export function LogoMark({
   return (
     <LogoGlyph
       {...(title ? { role: "img", "aria-label": title } : { "aria-hidden": true })}
-      className={cn("size-8 text-accent", className)}
+      className={cn("size-8", className)}
     />
   );
 }

@@ -42,7 +42,7 @@ export async function renderOgImage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <LogoGlyph color="#fa6c12" width={52} height={52} />
+          <LogoGlyph width={52} height={52} />
           <div style={{ display: "flex", fontSize: 30 }}>
             <span>SeedLogic</span>
             <span style={{ color: "#a4abc9", marginLeft: 10 }}>Labs</span>

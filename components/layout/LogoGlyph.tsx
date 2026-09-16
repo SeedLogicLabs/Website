@@ -1,27 +1,34 @@
 import type { SVGProps } from "react";
 
 /**
- * The SeedLogic Labs mark, single colour, no gradients: a sprout (stem and
- * two leaves, the left one slightly smaller) stacked over a circuit node (an
- * open ring flanked by two dots). Shared by the in-page logo and the OG image
- * renderer; `app/icon.svg` carries the same geometry as a static file.
+ * The SeedLogic Labs mark, flat colour, no gradients or outlines: two pointed
+ * leaves meeting at one point and fanning up and outward in a wide V, the left
+ * one smaller and in a deeper orange, the right one larger and in the brand
+ * orange; below them an open ring flanked by a small dot on each side.
  *
- * Renders a complete `<svg>` so Satori (OG images) can consume it; Satori
- * drops fragments inside `<svg>`. `color` defaults to `currentColor` so the
- * in-page mark follows text colour; Satori needs an explicit hex value.
+ * Shared by the in-page logo and the OG image renderer; `app/icon.svg` carries
+ * the same geometry and colours as a static file. Renders a complete `<svg>`
+ * because Satori (OG images) drops fragments placed inside `<svg>`.
  */
+export const LOGO_COLORS = {
+  /** Brand orange, `--color-accent`. */
+  bright: "#fa6c12",
+  /** Brand orange darkened ~22% for the smaller leaf. */
+  deep: "#c3540e",
+} as const;
+
 export function LogoGlyph({
-  color = "currentColor",
+  bright = LOGO_COLORS.bright,
+  deep = LOGO_COLORS.deep,
   ...props
-}: Omit<SVGProps<SVGSVGElement>, "color"> & { color?: string }) {
+}: SVGProps<SVGSVGElement> & { bright?: string; deep?: string }) {
   return (
     <svg viewBox="0 0 32 32" fill="none" {...props}>
-      <path d="M16 12V15" stroke={color} strokeWidth="2.6" strokeLinecap="round" />
-      <path d="M16 12C16 7.2 19.2 4 24.5 4C24.5 8.8 21.3 12 16 12Z" fill={color} />
-      <path d="M16 12.6C16 8.9 13.4 6.4 9.3 6.4C9.3 10.1 11.9 12.6 16 12.6Z" fill={color} />
-      <circle cx="16" cy="24" r="4.2" stroke={color} strokeWidth="2.6" />
-      <circle cx="7.4" cy="24" r="1.7" fill={color} />
-      <circle cx="24.6" cy="24" r="1.7" fill={color} />
+      <path d="M15.5 14.5C15.2 9 19 4.5 25 4.5C24.5 10 20.5 14.2 15.5 14.5Z" fill={bright} />
+      <path d="M15.5 14.5C15.6 10.8 12.8 7.5 7.5 7.5C7.9 11.3 11.2 14.3 15.5 14.5Z" fill={deep} />
+      <circle cx="16" cy="23" r="3.6" stroke={bright} strokeWidth="2.6" />
+      <circle cx="6.2" cy="23" r="1.7" fill={bright} />
+      <circle cx="25.8" cy="23" r="1.7" fill={bright} />
     </svg>
   );
 }
